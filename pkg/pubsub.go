@@ -9,7 +9,7 @@ import (
 
 func KafkaSubscriber(group ...string) message.Subscriber {
 	config := kafka.DefaultSaramaSubscriberConfig()
-	config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
 	g := ""
 	if len(group) > 0 {
@@ -33,14 +33,11 @@ func KafkaSubscriber(group ...string) message.Subscriber {
 }
 
 func KafkaPublisher() message.Publisher {
-	config := kafka.DefaultSaramaSyncPublisherConfig()
-
 	publisher, err := kafka.NewPublisher(
 		kafka.PublisherConfig{
-			Brokers:               []string{"localhost:9092"},
-			Marshaler:             kafka.DefaultMarshaler{},
-			OTELEnabled:           false,
-			OverwriteSaramaConfig: config,
+			Brokers:     []string{"localhost:9092"},
+			Marshaler:   kafka.DefaultMarshaler{},
+			OTELEnabled: false,
 		},
 		watermill.NewStdLogger(false, false),
 	)
